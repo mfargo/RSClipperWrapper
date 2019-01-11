@@ -30,8 +30,8 @@ final public class Clipper {
     }
     
     
-    public class func simplifyPolygon(_ polygon: [CGPoint]) -> [[CGPoint]] {
-        return (_Clipper.simplifyPolygon(polygon.map { NSValue(cgPoint: $0) } as [AnyObject]) as! [[NSValue]]).map { $0.map { $0.cgPointValue } }
+    public class func simplifyPolygon(_ polygon: [CGPoint], fillType: FillType = .evenOdd) -> [[CGPoint]] {
+        return (_Clipper.simplifyPolygon(polygon.map { NSValue(cgPoint: $0) } as [AnyObject], fillType: fillType.mapped) as! [[NSValue]]).map { $0.map { $0.cgPointValue } }
     }
     
     /// Constructs and returns the union of an array of polygons with an

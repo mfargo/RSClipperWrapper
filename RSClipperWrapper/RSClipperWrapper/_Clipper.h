@@ -17,7 +17,7 @@ typedef NS_ENUM(NSInteger, _FillType) {
 
 @interface _Clipper : NSObject
 
-+ (NSArray *) simplifyPolygon: (NSArray *) polygon;
++ (NSArray *) simplifyPolygon: (NSArray *) polygon fillType:(_FillType) fillType;
 + (NSArray *) unionPolygons:(NSArray *)subjPolygons subjFillType:(_FillType)subjFillType withPolygons:(NSArray *)clipPolygons clipFillType:(_FillType)clipFillType;
 + (NSArray *) differencePolygons:(NSArray *)subjPolygons subjFillType:(_FillType)subjFillType fromPolygons:(NSArray *)clipPolygons clipFillType:(_FillType)clipFillType;
 + (NSArray *) intersectPolygons:(NSArray *)subjPolygons subjFillType:(_FillType)subjFillType withPolygons:(NSArray *)clipPolygons clipFillType:(_FillType)clipFillType;

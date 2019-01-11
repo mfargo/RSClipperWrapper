@@ -14,7 +14,7 @@
 
 @implementation _Clipper
 
-+ (NSArray *) simplifyPolygon: (NSArray *) polygon {
++ (NSArray *) simplifyPolygon: (NSArray *) polygon fillType:(_FillType) fillType {
     ClipperLib::Clipper clipper;
     clipper.StrictlySimple();
     ClipperLib::Path path;
@@ -22,7 +22,25 @@
         path.push_back(ClipperLib::IntPoint(kClipperScale*vertex.CGPointValue.x, kClipperScale*vertex.CGPointValue.y));
     }
     ClipperLib::Paths paths;
-    ClipperLib::SimplifyPolygon(path, paths);
+    
+    ClipperLib::PolyFillType _fillType;
+    
+    switch (fillType) {
+        case EvenOdd:
+            _fillType = ClipperLib::PolyFillType::pftEvenOdd;
+            break;
+        case NonZero:
+            _fillType = ClipperLib::PolyFillType::pftNonZero;
+            break;
+        case Positive:
+            _fillType = ClipperLib::PolyFillType::pftPositive;
+            break;
+        case Negative:
+            _fillType = ClipperLib::PolyFillType::pftNegative;
+            break;
+    }
+    
+    ClipperLib::SimplifyPolygon(path, paths, _fillType);
     NSMutableArray *polygons = [NSMutableArray arrayWithCapacity:paths.size()];
     for (int i = 0; i < paths.size(); i++) {
         ClipperLib::Path path = paths[i];
