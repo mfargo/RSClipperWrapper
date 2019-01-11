@@ -13,10 +13,34 @@ class Scene : SKScene {
     
     let polygon1 = [CGPoint(x: -50, y: -50), CGPoint(x: -50, y: 25), CGPoint(x: 25, y: 25), CGPoint(x: 25, y: -50)]
     let polygon2 = [CGPoint(x: -25, y: -25), CGPoint(x: -25, y: 50), CGPoint(x: 50, y: 50), CGPoint(x: 50, y: -25)]
-    
+
     override func didMove(to view: SKView) {
         backgroundColor = SKColor.white
         anchorPoint = CGPoint(x: 0.5, y: 0.5)
+
+        var star = [CGPoint]()
+        let increment:CGFloat = (2 * .pi) / 5
+        let radius:CGFloat = 50
+        for i in [0, 2, 4, 1, 3] {
+            let angle = increment * CGFloat(i)
+            star.append(CGPoint(x: sin(angle) * radius, y: -100 + cos(angle) * radius))
+        }
+        
+        let starNode = SKShapeNode()
+        starNode.strokeColor = SKColor.black
+        starNode.lineWidth = 1
+        starNode.path = CGPath.pathOfPolygons(polygons: [star])
+        addChild(starNode)
+
+        let starPolygon = Clipper.simplifyPolygon(star, fillType: .nonZero)
+
+        let starClipperNode = SKShapeNode()
+        starClipperNode.lineWidth = 0
+        starClipperNode.fillColor = SKColor.red
+        starClipperNode.zPosition = -1
+        starClipperNode.path = CGPath.pathOfPolygons(polygons: starPolygon)
+        addChild(starClipperNode)
+
         
         let polygonNode1 = SKShapeNode()
         polygonNode1.strokeColor = SKColor.black
@@ -38,6 +62,7 @@ class Scene : SKScene {
         clipperNode.zPosition = -1
         clipperNode.path = CGPath.pathOfPolygons(polygons: clipperPolygon)
         addChild(clipperNode)
+        
         
         let pt = CGPoint.zero
         let inPoly = Clipper.polygonContainsPoint(clipperPolygon[0], point: pt)
