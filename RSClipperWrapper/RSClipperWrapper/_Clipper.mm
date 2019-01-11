@@ -14,6 +14,27 @@
 
 @implementation _Clipper
 
++ (NSArray *) simplifyPolygon: (NSArray *) polygon {
+    ClipperLib::Clipper clipper;
+    clipper.StrictlySimple();
+    ClipperLib::Path path;
+    for (NSValue *vertex : polygon) {
+        path.push_back(ClipperLib::IntPoint(kClipperScale*vertex.CGPointValue.x, kClipperScale*vertex.CGPointValue.y));
+    }
+    ClipperLib::Paths paths;
+    ClipperLib::SimplifyPolygon(path, paths);
+    NSMutableArray *polygons = [NSMutableArray arrayWithCapacity:paths.size()];
+    for (int i = 0; i < paths.size(); i++) {
+        ClipperLib::Path path = paths[i];
+        NSMutableArray *polygon = [NSMutableArray arrayWithCapacity:path.size()];
+        for (int j = 0; j < path.size(); j++) {
+            [polygon addObject:[NSValue valueWithCGPoint:CGPointMake(path[j].X/kClipperScale, path[j].Y/kClipperScale)]];
+        }
+        [polygons addObject:polygon];
+    }
+    return polygons;
+}
+
 + (NSArray *) unionPolygons:(NSArray *)subjPolygons subjFillType:(_FillType)subjFillType withPolygons:(NSArray *)clipPolygons clipFillType:(_FillType)clipFillType {
     
     return [_Clipper executePolygons:subjPolygons subjFillType:subjFillType withPolygons:clipPolygons clipFillType:clipFillType clipType:ClipperLib::ClipType::ctUnion];
@@ -33,6 +54,8 @@
     
     return [_Clipper executePolygons:subjPolygons subjFillType:subjFillType withPolygons:clipPolygons clipFillType:clipFillType clipType:ClipperLib::ClipType::ctXor];
 }
+
+
 
 +(NSArray *) executePolygons:(NSArray *)subjPolygons subjFillType:(_FillType)subjFillType withPolygons:(NSArray *)clipPolygons clipFillType:(_FillType)clipFillType clipType:(ClipperLib::ClipType)clipType {
     
