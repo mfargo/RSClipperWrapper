@@ -14,6 +14,20 @@
 
 @implementation _Clipper
 
+
++ (ClipperLib::PolyFillType) clipperFillTypeFor: (_FillType) fillType {
+    switch (fillType) {
+        case EvenOdd:
+            return ClipperLib::PolyFillType::pftEvenOdd;
+        case NonZero:
+            return ClipperLib::PolyFillType::pftNonZero;
+        case Positive:
+            return ClipperLib::PolyFillType::pftPositive;
+        case Negative:
+            return ClipperLib::PolyFillType::pftNegative;
+    }
+}
+
 + (NSArray *) simplifyPolygon: (NSArray *) polygon fillType:(_FillType) fillType {
     ClipperLib::Clipper clipper;
     ClipperLib::Path path;
@@ -22,26 +36,8 @@
     }
     ClipperLib::Paths paths;
     
-    ClipperLib::PolyFillType _fillType;
-    
-    switch (fillType) {
-        case EvenOdd:
-            _fillType = ClipperLib::PolyFillType::pftEvenOdd;
-            break;
-        case NonZero:
-            _fillType = ClipperLib::PolyFillType::pftNonZero;
-            break;
-        case Positive:
-            _fillType = ClipperLib::PolyFillType::pftPositive;
-            break;
-        case Negative:
-            _fillType = ClipperLib::PolyFillType::pftNegative;
-            break;
-    }
-    
-    ClipperLib::SimplifyPolygon(path, paths, _fillType);
+    ClipperLib::SimplifyPolygon(path, paths, [_Clipper clipperFillTypeFor:fillType]);
     NSMutableArray *polygons = [NSMutableArray array];
-    NSLog(@"pre");
     for (int i = 0; i < paths.size(); i++) {
         ClipperLib::Path path = paths[i];
         NSMutableArray *polygon = [NSMutableArray array];
@@ -50,7 +46,6 @@
         }
         [polygons addObject:polygon];
     }
-    NSLog(@"post");
     return polygons;
 }
 
@@ -98,41 +93,7 @@
     }
     
     ClipperLib::Paths paths;
-    
-    ClipperLib::PolyFillType _subjFillType;
-    ClipperLib::PolyFillType _clipFillType;
-    
-    switch (subjFillType) {
-        case EvenOdd:
-            _subjFillType = ClipperLib::PolyFillType::pftEvenOdd;
-            break;
-        case NonZero:
-            _subjFillType = ClipperLib::PolyFillType::pftNonZero;
-            break;
-        case Positive:
-            _subjFillType = ClipperLib::PolyFillType::pftPositive;
-            break;
-        case Negative:
-            _subjFillType = ClipperLib::PolyFillType::pftNegative;
-            break;
-    }
-    
-    switch (clipFillType) {
-        case EvenOdd:
-            _clipFillType = ClipperLib::PolyFillType::pftEvenOdd;
-            break;
-        case NonZero:
-            _clipFillType = ClipperLib::PolyFillType::pftNonZero;
-            break;
-        case Positive:
-            _clipFillType = ClipperLib::PolyFillType::pftPositive;
-            break;
-        case Negative:
-            _clipFillType = ClipperLib::PolyFillType::pftNegative;
-            break;
-    }
-    
-    clipper.Execute(clipType, paths, _subjFillType, _clipFillType);
+    clipper.Execute(clipType, paths, [_Clipper clipperFillTypeFor:subjFillType], [_Clipper clipperFillTypeFor:clipFillType]);
 
     NSMutableArray *polygons = [NSMutableArray arrayWithCapacity:paths.size()];
     for (int i = 0; i < paths.size(); i++) {
